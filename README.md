@@ -1,4 +1,4 @@
-# Hufman en-/decoding
+# Huffman en-/decoding
 https://codingchallenges.fyi/challenges/challenge-huffman/
 
 Run with

@@ -12,7 +12,10 @@ struct Huffer: ParsableCommand {
         let contents = readFile(filePath: self.file)
         let freqBuilder = FrequencyBuilder()
         let frequencies = freqBuilder.getFrequency(content: contents)
+        let generator = CodeGenerator()
+        let codes = generator.generateCode(frequencies: frequencies)
         print(frequencies)
+        print(codes)
     }
 
     func readFile(filePath: String) -> String {

@@ -13,16 +13,6 @@ struct TreeBuilderTests {
         [Character("a"): 1]
     }
 
-    func getTwoFrequencies() -> [Character : Int] {
-        [Character("a"): 4, Character("b"): 2]
-    }
-
-    func getThreeFrequencies() -> [Character : Int] {
-        var d = [Character("c"): 1]
-        d.merge(getTwoFrequencies()) { (current, _) in current }
-        return d
-    }
-
     @Test func getFrequencyWithSingleCharacter() {
         let expectedOutput = HuffTree("a", 1)
         #expect(treebuilder.buildTree(frequencies: getSingleFrequency()) == expectedOutput)
@@ -30,7 +20,7 @@ struct TreeBuilderTests {
 
     @Test func createHeapReturnsInitialHeap() {
         let expectedOutput = HuffTree("b", 2)
-        var heap = treebuilder.createHeap(getTwoFrequencies())
+        var heap = treebuilder.createHeap(TestHelper.getTwoFrequencies())
         #expect(heap.popMin() == expectedOutput)
     }
 
@@ -40,7 +30,7 @@ struct TreeBuilderTests {
         let nodeC = CharacterNode("c", 1)
         let nodeBAndC = InternalNode(left: nodeC, right: nodeB)
         let expectedOutput = HuffTree(left: nodeBAndC, right: nodeA)
-        let tree = treebuilder.buildTree(frequencies: getThreeFrequencies())
+        let tree = treebuilder.buildTree(frequencies: TestHelper.getThreeFrequencies())
         #expect(tree == expectedOutput)
         let root = tree.root as! InternalNode
         #expect((root.left as! InternalNode).isLeaf  == false)

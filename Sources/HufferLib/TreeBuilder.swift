@@ -2,9 +2,6 @@ import Collections
 
 public struct TreeBuilder {
 
-    public init() {
-    }
-
     internal func buildTree(frequencies: [Character : Int]) -> HuffTree {
         var heap = createHeap(frequencies)
         let tree = mergeNodes(&heap)

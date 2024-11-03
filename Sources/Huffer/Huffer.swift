@@ -11,9 +11,8 @@ struct Huffer: ParsableCommand {
         print(self.file)
         let contents = readFile(filePath: self.file)
         let freqBuilder = FrequencyBuilder()
-        let count = freqBuilder.getFrequency(content: contents)
-        print(contents.count)
-        print(count)
+        let frequencies = freqBuilder.getFrequency(content: contents)
+        print(frequencies)
     }
 
     func readFile(filePath: String) -> String {

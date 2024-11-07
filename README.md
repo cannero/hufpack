@@ -8,3 +8,6 @@ swift run huffer --file ..\135-0.txt
 
 # Remarks
 - There seems to be a problem if everything is in a huffer folder
+# todo
+- can argument parser be called with sub parameters read/write
+- check https://stackoverflow.com/questions/56533917/how-do-i-write-huffman-encoded-characters-to-a-file

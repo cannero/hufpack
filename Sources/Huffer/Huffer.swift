@@ -16,6 +16,22 @@ struct Huffer: ParsableCommand {
         let codes = generator.generateCode(frequencies: frequencies)
         print(frequencies)
         print(codes)
+
+        let filePath = "../testfile.bin"
+        let data: [UInt8] = [1,0,1]
+
+        do {
+            if !FileManager.default.fileExists(atPath: filePath) {
+                _ = FileManager.default.createFile(atPath: filePath, contents: nil, attributes: nil)
+            }
+
+            let fileHandle = FileHandle(forWritingAtPath: filePath)!
+            try fileHandle.write(contentsOf: data)
+            try fileHandle.close()
+            print("file written")
+        } catch {
+            print("Error writing file: \(error)")
+        }
     }
 
     func readFile(filePath: String) -> String {

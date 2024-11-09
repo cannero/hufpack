@@ -2,12 +2,31 @@ import Foundation
 
 public struct CodeSerializer {
     var ioHandler: IOHandler
+    let codes: [Character : String]
 
-    public init(ioHandler: IOHandler) {
+    public init(ioHandler: IOHandler, codes: [Character : String]) {
         self.ioHandler = ioHandler
+        self.codes = codes
     }
 
-    func writeContent(_ content: String, _ codes: [Character : String]) throws {
+    public func writeHeader() throws {
+        try ioHandler.write(contentsOf: Array("HF".utf8))
+        // version
+        try ioHandler.write(contentsOf: [1,0])
+
+        var codesAsString = ""
+        for (char, code) in codes {
+            codesAsString.append(char)
+            codesAsString += ":" + code + ";"
+        }
+
+        let length = getLengthArray(codesAsString.count)
+        try ioHandler.write(contentsOf: length)
+
+        try ioHandler.write(contentsOf: Array(codesAsString.utf8))
+    }
+
+    public func writeContent(_ content: String) throws {
         var stringbuffer = ""
         
         for char in content {
@@ -36,6 +55,22 @@ public struct CodeSerializer {
 
         print("Cannot convert \(binary) to uint8")
         exit(1)
+    }
+
+    func getLengthArray(_ length: Int) -> [UInt8] {
+        var length = length
+        var arr: [UInt8] = []
+        while length > 0 {
+            arr.append(UInt8(length & 0xff))
+            length >>= 8
+        }
+
+        while arr.count < 4 {
+            arr.append(0)
+        }
+
+        arr.reverse()
+        return arr
     }
 }
 

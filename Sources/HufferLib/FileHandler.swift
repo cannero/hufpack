@@ -1,6 +1,6 @@
 import Foundation
 
-struct FileHandler: IOHandler {
+public struct FileHandler: IOHandler {
     var handle: FileHandle
 
     public init(handle: FileHandle) {

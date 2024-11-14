@@ -13,18 +13,33 @@ struct CodeSerializerTests {
 
     @Test func writeHeader() throws {
         let (handler, serializer) = createTestingClasses(codes)
-        let expectedOutput: [UInt8] = [
+        let expectedOutput_a: [UInt8] = [
             // HF and version 1.0
             0x48, 0x46, 0x01, 0x00,
-            // length
+            // length codes
+            0x00, 0x00, 0x00, 0x0e,
+            // codes, a is written first
+            0x61, 0x3a, 0x31, 0x31, 0x30, 0x30, 0x3b,
+            0x62, 0x3a, 0x30, 0x30, 0x31, 0x31, 0x3b,
+            // char count
+            0x00, 0x00, 0x00, 0x02,
+        ]
+
+        let expectedOutput_b: [UInt8] = [
+            // HF and version 1.0
+            0x48, 0x46, 0x01, 0x00,
+            // length codes
             0x00, 0x00, 0x00, 0x0e,
             // codes, b is written first
             0x62, 0x3a, 0x30, 0x30, 0x31, 0x31, 0x3b,
             0x61, 0x3a, 0x31, 0x31, 0x30, 0x30, 0x3b,
+            // char count
+            0x00, 0x00, 0x00, 0x02,
         ]
-        try serializer.writeHeader()
 
-        #expect(handler.buffer == expectedOutput)
+        try serializer.writeHeader("😈😻")
+
+        #expect(handler.buffer == expectedOutput_a || handler.buffer == expectedOutput_b)
     }
 
     @Test func writeContentWith16Bits() throws {

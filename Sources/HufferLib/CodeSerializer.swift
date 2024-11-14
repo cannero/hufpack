@@ -9,9 +9,9 @@ public struct CodeSerializer {
         self.codes = codes
     }
 
-    public func writeHeader() throws {
+    public func writeHeader(_ content: String) throws {
         try ioHandler.write(contentsOf: Array("HF".utf8))
-        // version
+        // 2 bytes version
         try ioHandler.write(contentsOf: [1,0])
 
         var codesAsString = ""
@@ -20,10 +20,16 @@ public struct CodeSerializer {
             codesAsString += ":" + code + ";"
         }
 
+        // 4 bytes codes length
         let length = getLengthArray(codesAsString.count)
         try ioHandler.write(contentsOf: length)
 
+        // codes
         try ioHandler.write(contentsOf: Array(codesAsString.utf8))
+
+        // 4 bytes content char count
+        let charcount = getLengthArray(content.count)
+        try ioHandler.write(contentsOf: charcount)
     }
 
     public func writeContent(_ content: String) throws {

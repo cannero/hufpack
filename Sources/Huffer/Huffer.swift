@@ -25,8 +25,8 @@ struct Huffer: ParsableCommand {
             let fileHandle = FileHandle(forWritingAtPath: filePath)!
             let handler = FileHandler(handle: fileHandle)
             let serializer = CodeSerializer(ioHandler: handler, codes: codes)
-            try serializer.writeHeader()
-            //try serializer.writeContent(contents)
+            try serializer.writeHeader(contents)
+            try serializer.writeContent(contents)
             try fileHandle.close()
             print("file written")
         } catch {

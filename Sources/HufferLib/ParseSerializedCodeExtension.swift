@@ -2,26 +2,34 @@ import Foundation
 
 // https://www.swiftbysundell.com/articles/string-parsing-in-swift/
 extension String {
-    var codes: [Character : String] {
-        var key: Character?
+
+    enum ParseState {
+        case code
+        case key
+    }
+
+    var codes: [String : Character] {
+        var currentState: ParseState = .code
         var partialCode: String?
-        var parsed: [Character : String] = [:]
+        var parsed: [String : Character] = [:]
 
         func parse(_ character: Character) {
-            if key == nil {
-                key = character
-            }
-            else if character == ";" {
-                parsed[key!] = partialCode!
-                key = nil
+            switch currentState {
+            case .code:
+                if character == ":" {
+                    currentState = .key
+                } else {
+                    if var currentCode = partialCode {
+                        currentCode.append(character)
+                        partialCode = currentCode
+                    } else {
+                        partialCode = String(character)
+                    }
+                }
+            case .key:
+                parsed[partialCode!] = character
+                currentState = .code
                 partialCode = nil
-            }
-            else if var currentCode = partialCode {
-                currentCode.append(character)
-                partialCode = currentCode
-            }
-            else {
-                partialCode = String(character)
             }
         }
 

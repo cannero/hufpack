@@ -16,8 +16,8 @@ public struct CodeSerializer {
 
         var codesAsString = ""
         for (char, code) in codes {
+            codesAsString += code + ":"
             codesAsString.append(char)
-            codesAsString += code + ";"
         }
 
         // 4 bytes codes length

@@ -2,6 +2,8 @@ import Foundation
 
 public struct CodeDeserializer {
 
+    public init(){}
+
     public func deserialize<S: AsyncSequence>(_ sequence: S) async throws -> String where S.Element == UInt8 {
         var iterator = sequence.makeAsyncIterator()
         let idAndVersion = try await iterator.next(4)
@@ -25,12 +27,13 @@ public struct CodeDeserializer {
 
         let codes = codesString.codes
 
-        let lengthHuffHex = try await iterator.next(4)
-        let lengthHuffBlock = bytesToNum(lengthHuffHex)
-        let result = try await parseHuffmanCodes(codes, &iterator)
+        let countHuffHex = try await iterator.next(4)
+        let countHuffBlock = bytesToNum(countHuffHex)
+        let result = try await parseHuffmanCodes(codes, countHuffBlock, &iterator)
 
-        if result.count != lengthHuffBlock {
-            print("length don't match \(result.count) <-> \(lengthHuffBlock)")
+        if result.count < countHuffBlock {
+            print(result)
+            print("length don't match \(result.count) <-> \(countHuffBlock)")
             exit(5)
         }
 
@@ -52,7 +55,7 @@ public struct CodeDeserializer {
         return num
     }
 
-    func parseHuffmanCodes<I: AsyncIteratorProtocol>(_ codes: [String : Character], _ bytes: inout I) async throws -> String  where I.Element == UInt8 {
+    func parseHuffmanCodes<I: AsyncIteratorProtocol>(_ codes: [String : Character], _ charCount: Int, _ bytes: inout I) async throws -> String  where I.Element == UInt8 {
         var result = ""
         var currentBuffer = ""
 
@@ -62,6 +65,10 @@ public struct CodeDeserializer {
                 currentBuffer.append(bit)
                 if let char = codes[currentBuffer] {
                     result.append(char)
+                    if result.count == charCount {
+                        break
+                    }
+
                     currentBuffer = ""
                 }
             }

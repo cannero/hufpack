@@ -40,9 +40,22 @@ struct CodeDeserializerTests {
         let inputSequence = UInt8ArrayAsyncSequence(array: input)
         var iterator = inputSequence.makeAsyncIterator()
         let deserializer = createTestingClasses()
-        let result = try await deserializer.parseHuffmanCodes(codes, &iterator)
+        let result = try await deserializer.parseHuffmanCodes(codes, 3, &iterator)
 
         #expect(result == "😎🌯⯿")
+    }
+
+    @Test func parseHuffmanCodesLastBytesFilledUpWithNulls_OnlyNCharsTaken() async throws {
+        let codes: [String : Character] = ["00" : "t", "10" : "a"]
+        let input: [UInt8] = [
+            0b1000_0000,
+        ]
+        let inputSequence = UInt8ArrayAsyncSequence(array: input)
+        var iterator = inputSequence.makeAsyncIterator()
+        let deserializer = createTestingClasses()
+        let result = try await deserializer.parseHuffmanCodes(codes, 2, &iterator)
+
+        #expect(result == "at")
     }
 }
 

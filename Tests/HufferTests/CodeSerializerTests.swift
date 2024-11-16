@@ -42,6 +42,30 @@ struct CodeSerializerTests {
         #expect(handler.buffer == expectedOutput_a || handler.buffer == expectedOutput_b)
     }
 
+    @Test func writeCodesWithUtf8Chars() throws {
+        let utf8Code: [Character : String] = ["🤠": "1"]
+        let (handler, serializer) = createTestingClasses(utf8Code)
+        let expectedOutput: [UInt8] = [
+            // length codes
+            0x00, 0x00, 0x00, 0x06,
+            0x31, 0x3a, 0xf0, 0x9f, 0xa4, 0xa0]
+        try serializer.writeCodes()
+
+        #expect(handler.buffer == expectedOutput)
+    }
+
+    @Test func writeCodesWithNewline() throws {
+        let newlineCode: [Character : String] = ["\r\n": "0"]
+        let (handler, serializer) = createTestingClasses(newlineCode)
+        let expectedOutput: [UInt8] = [
+            // length codes
+            0x00, 0x00, 0x00, 0x04,
+            0x30, 0x3a, 0x0d, 0x0a]
+        try serializer.writeCodes()
+
+        #expect(handler.buffer == expectedOutput)
+    }
+
     @Test func writeContentWith16Bits() throws {
         let (handler, serializer) = createTestingClasses(codes)
         let expectedOutput: [UInt8] = [ 0b11000011, 0b00111100]
@@ -67,6 +91,7 @@ struct CodeSerializerTests {
 
         #expect(handler.buffer == expectedOutput)
     }
+
 }
 
 class IOHandlerMock : IOHandler {

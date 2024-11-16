@@ -14,22 +14,27 @@ public struct CodeSerializer {
         // 2 bytes version
         try ioHandler.write(contentsOf: [1,0])
 
+        try writeCodes()
+
+        // 4 bytes content char count
+        let charcount = getLengthArray(content.count)
+        try ioHandler.write(contentsOf: charcount)
+    }
+
+    func writeCodes() throws {
         var codesAsString = ""
         for (char, code) in codes {
             codesAsString += code + ":"
             codesAsString.append(char)
         }
 
-        // 4 bytes codes length
-        let length = getLengthArray(codesAsString.count)
+        let codesAsBytes = Array(codesAsString.utf8)
+
+        // 4 bytes for the byte length of the codes
+        let length = getLengthArray(codesAsBytes.count)
         try ioHandler.write(contentsOf: length)
-
         // codes
-        try ioHandler.write(contentsOf: Array(codesAsString.utf8))
-
-        // 4 bytes content char count
-        let charcount = getLengthArray(content.count)
-        try ioHandler.write(contentsOf: charcount)
+        try ioHandler.write(contentsOf: codesAsBytes)
     }
 
     public func writeContent(_ content: String) throws {

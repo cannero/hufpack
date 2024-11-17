@@ -57,6 +57,15 @@ struct CodeDeserializerTests {
 
         #expect(result == "at")
     }
+
+    @Test func toBits() async throws {
+        let expected = [false, true, false, false, true, true, true, false]
+        let byte: UInt8 = 0b0100_1110
+        let deserializer = createTestingClasses()
+        let result = deserializer.toBits(byte)
+
+        #expect(result == expected)
+    }
 }
 
 struct UInt8ArrayAsyncSequence: AsyncSequence {

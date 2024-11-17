@@ -55,14 +55,18 @@ public struct CodeDeserializer {
         return num
     }
 
-    func parseHuffmanCodes<I: AsyncIteratorProtocol>(_ codes: [String : Character], _ charCount: Int, _ bytes: inout I) async throws -> String  where I.Element == UInt8 {
+    func parseHuffmanCodes<I: AsyncIteratorProtocol>(_ codes: [String : Character], _ charCount: Int, _ bytes: inout I) async throws
+    -> String  where I.Element == UInt8 {
         var result = ""
         var currentBuffer = ""
 
         while let byte = try await bytes.next() {
-            let binary = toBinaryString(byte)
-            for bit in binary {
-                currentBuffer.append(bit)
+            for bit in toBits(byte) {
+                if bit {
+                    currentBuffer.append("1")
+                } else {
+                    currentBuffer.append("0")
+                }
                 if let char = codes[currentBuffer] {
                     result.append(char)
                     if result.count == charCount {
@@ -77,9 +81,20 @@ public struct CodeDeserializer {
         return result
     }
 
-    func toBinaryString(_ byte: UInt8) -> String {
-        let binaryString = String(byte, radix: 2)
-        return String(repeating: "0", count: 8 - binaryString.count) + binaryString
+    func toBits(_ byte: UInt8) -> [Bool] {
+        var byte = byte
+        var res: [Bool] = []
+        for _ in 0..<8 {
+            if byte & 0x80 != 0 {
+                res.append(true)
+            } else {
+                res.append(false)
+            }
+
+            byte <<= 1
+        }
+
+        return res
     }
 }
 

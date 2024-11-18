@@ -2,7 +2,7 @@ import Foundation
 
 public struct CodeDeserializer {
 
-    public init(){}
+    public init() {}
 
     public func deserialize<S: AsyncSequence>(_ sequence: S) async throws -> String where S.Element == UInt8 {
         var iterator = sequence.makeAsyncIterator()
@@ -56,9 +56,12 @@ public struct CodeDeserializer {
     }
 
     func parseHuffmanCodes<I: AsyncIteratorProtocol>(_ codes: [String : Character], _ charCount: Int, _ bytes: inout I) async throws
-    -> String  where I.Element == UInt8 {
+        -> String where I.Element == UInt8 {
         var result = ""
         var currentBuffer = ""
+        // don't access result.count,
+        // it will iterate through the elements of the string and slow everything down
+        var actualCount = 0
 
         while let byte = try await bytes.next() {
             for bit in toBits(byte) {
@@ -67,13 +70,14 @@ public struct CodeDeserializer {
                 } else {
                     currentBuffer.append("0")
                 }
+
                 if let char = codes[currentBuffer] {
+                    actualCount += 1
                     result.append(char)
-                    if result.count == charCount {
+                    currentBuffer = ""
+                    if actualCount == charCount {
                         break
                     }
-
-                    currentBuffer = ""
                 }
             }
         }
